@@ -7,6 +7,7 @@ const url = 'mongodb://localhost:27017/nucampsite';
 // connects mongodb client to nucampsitedb
 const connect = mongoose.connect(url, {
     useCreateIndex: true,
+    useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -23,14 +24,34 @@ connect.then(() => {
         description: 'test'
     })
     .then(campsite => {
+        // logs the original campsite document
         console.log(campsite);
 
-        // find() returns a promise with all documents based on the Campsite model in an array of objects
-        return Campsite.find();
+        // findByIdAndUpdate() updates the campsite document and adds a comment subdoc
+        return Campsite.findByIdAndUpdate(campsite._id, {
+            $set: { description: 'Update Test Document' }
+        }, {
+            // this will return the updated document
+            new: true
+        });
     })
-    .then(campsites => {
-        // log the array of objects with documents based on Campsite model
-        console.log(campsites);
+    .then(campsite => {
+        // logs the updated campsite document
+        console.log(campsite);
+
+        // adds the comments subdocument
+        campsite.comments.push({
+            rating: 5, 
+            text: 'What a magnificent view!',
+            author: 'Tinus Lorvaldes'
+        });
+
+        // saves document and returns promise with the campsite that was saved with the new comments subdoc
+        return campsite.save();
+    })
+    .then(campsite => {
+        // log the campsite document updated with the comments subdoc
+        console.log(campsite);
 
         // deleteMany() method called on all documents using Campsite model
         return Campsite.deleteMany();

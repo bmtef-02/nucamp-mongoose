@@ -1,6 +1,27 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// instantiate new object that will hold comments about a campsite
+const commentSchema = new Schema({
+    rating: {
+        type: Number,
+        min: 1,
+        max: 5,
+        required: true
+    },
+    text: {
+        type: String,
+        required: true
+    },
+    author: {
+        type: String,
+        required: true
+    }
+}, {
+    // will add properties createAt and updatedAt with the time it was created
+    timestamps: true
+});
+
 // instantiate new object named campsiteSchema
 const campsiteSchema = new Schema({
     name: {
@@ -11,7 +32,9 @@ const campsiteSchema = new Schema({
     description: {
         type: String,
         required: true
-    }
+    },
+    // adding commentSchema as a subdoc
+    comments: [commentSchema]
 }, {
     // will add properties createAt and updatedAt with the time it was created
     timestamps: true
